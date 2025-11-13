@@ -2,6 +2,7 @@ const PRODUCTS = {
   apple: { name: "Apple", emoji: "🍏" },
   banana: { name: "Banana", emoji: "🍌" },
   lemon: { name: "Lemon", emoji: "🍋" },
+  strawberry: { name: "Strawberry", emoji: "🍓" },
 };
 
 function getBasket() {
@@ -18,12 +19,50 @@ function getBasket() {
 
 function addToBasket(product) {
   const basket = getBasket();
+
+  // Check for strawberry-banana incompatibility
+  if (product === "strawberry" && basket.includes("banana")) {
+    showError("Strawberries and bananas cannot be combined.");
+    return false;
+  }
+  if (product === "banana" && basket.includes("strawberry")) {
+    showError("Strawberries and bananas cannot be combined.");
+    return false;
+  }
+
   basket.push(product);
   localStorage.setItem("basket", JSON.stringify(basket));
+  return true;
 }
 
 function clearBasket() {
   localStorage.removeItem("basket");
+}
+
+function showError(message) {
+  // Remove any existing error messages
+  const existingError = document.querySelector(".error-message");
+  if (existingError) {
+    existingError.remove();
+  }
+
+  // Create error message element
+  const errorDiv = document.createElement("div");
+  errorDiv.className = "error-message";
+  errorDiv.textContent = message;
+  errorDiv.setAttribute("role", "alert");
+  errorDiv.setAttribute("aria-live", "assertive");
+
+  // Insert at the top of main content
+  const mainContent = document.getElementById("main-content");
+  if (mainContent) {
+    mainContent.insertBefore(errorDiv, mainContent.firstChild);
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      errorDiv.remove();
+    }, 5000);
+  }
 }
 
 function renderBasket() {
